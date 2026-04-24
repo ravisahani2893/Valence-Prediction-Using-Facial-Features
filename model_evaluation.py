@@ -8,7 +8,6 @@ from sklearn.metrics import root_mean_squared_error
 # 1. LOAD DATA
 # ============================================================================
 train_data = pd.read_csv('visual_train_features.csv')
-val_data   = pd.read_csv('visual_val_features.csv')
 test_data  = pd.read_csv('visual_test_features.csv')
 
 # ============================================================================
@@ -34,31 +33,25 @@ y_test  = test_data[target_variable].values.astype(np.float32)
 train_x_mean = np.mean(train_x, axis=0)
 train_x_std  = np.std(train_x, axis=0)
 
-# avoid division by zero
+# Avoid division by zero
 train_x_std[train_x_std == 0] = 1.0
 
-# scale test data using TRAIN stats
+# Scale test data using TRAIN statistics
 test_x_scaled = (test_x - train_x_mean) / train_x_std
 
 # ============================================================================
-# 5. LOAD AND EVALUATE MODELS
+# 5. LOAD AND EVALUATE DEEP NEURAL NETWORK
 # ============================================================================
 
-models = {
-    "Deep Neural Network": "models/mlp_deep_neural_network_mode.h5",
-    "Simple Neural Network": "models/mlp_simple_neural_network_mode.h5"
-}
+model_path = "models/mlp_deep_neural_network_mode.h5"
 
-print("\n--- Model Evaluation on Test Data ---\n")
+print("\n--- Deep Neural Network Evaluation on Test Data ---\n")
 
-for model_name, model_path in models.items():
-    
-    if not os.path.exists(model_path):
-        print(f"{model_name}: Model file not found -> {model_path}")
-        continue
-
+if not os.path.exists(model_path):
+    print(f"Model file not found -> {model_path}")
+else:
     # Load model
-    model = model = keras.models.load_model(model_path, compile=False)
+    model = keras.models.load_model(model_path, compile=False)
 
     # Predict
     y_pred = model.predict(test_x_scaled).ravel()
@@ -66,5 +59,4 @@ for model_name, model_path in models.items():
     # Evaluate
     rmse = root_mean_squared_error(y_test, y_pred)
 
-    print(f"{model_name} Test RMSE: {rmse:.6f}")
-
+    print(f"Deep Neural Network Test RMSE: {rmse:.6f}")
